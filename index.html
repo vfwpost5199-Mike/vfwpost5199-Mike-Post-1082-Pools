@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Post 1082 March Madness Squares</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1>Post 1082 March Madness Squares</h1>
+      <div id="sub" class="sub">Click an open square to claim it.</div>
+      <div class="sub">
+        Claimed: <span id="claimedCount">0</span> • Remaining: <span id="remainingCount">100</span> • Paid: <span id="paidCount">0</span>
+      </div>
+
+      <div class="toggles">
+        <label class="toggle">
+          <input type="checkbox" id="openOnly" />
+          Show only open squares
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="highlightPaid" checked />
+          Highlight paid squares
+        </label>
+      </div>
+    </div>
+
+    <div class="right">
+      <button id="refreshBtn">Refresh</button>
+      <span id="status" class="status">Loading…</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="board">
+      <div class="gridWrap">
+        <div id="grid" class="grid" aria-label="Squares grid"></div>
+      </div>
+      <div class="footerLinks">
+        <a href="../index.html">Home</a> • <a href="admin.html">Admin</a>
+      </div>
+    </section>
+
+    <section class="legend">
+      <h2>Claimed</h2>
+      <div id="claimedList" class="claimed"></div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+      <h3 id="modalTitle">Claim Square</h3>
+
+      <form id="claimForm">
+        <label>
+          Full Name *
+          <input id="name" required minlength="3" autocomplete="name" />
+        </label>
+
+        <label>
+          Email *
+          <input id="email" type="email" required autocomplete="email" placeholder="name@email.com" />
+        </label>
+        <div id="emailHint" class="hint"></div>
+
+        <label>
+          Cell Phone *
+          <input id="phone" required inputmode="tel" placeholder="(516) 555-1212" maxlength="14" />
+        </label>
+
+        <label>
+          Paid?
+          <select id="paid">
+            <option value="N" selected>No</option>
+            <option value="Y">Yes</option>
+          </select>
+        </label>
+
+        <label>
+          Note (optional)
+          <input id="note" maxlength="60" />
+        </label>
+
+        <div class="actions">
+          <button type="button" id="cancelBtn">Cancel</button>
+          <button type="submit" class="primary">Claim</button>
+        </div>
+
+        <div id="formMsg" class="msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
