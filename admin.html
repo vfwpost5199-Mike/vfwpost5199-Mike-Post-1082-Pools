@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Squares Admin</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1>Squares Admin</h1>
+      <div class="sub">Admin key is stored only on this device (localStorage).</div>
+    </div>
+    <div class="right">
+      <a href="../index.html" style="color:#e7edf4;text-decoration:underline;">Home</a>
+      <a href="index.html" style="color:#e7edf4;text-decoration:underline;">Board</a>
+    </div>
+  </header>
+
+  <main class="wrap" style="grid-template-columns:1fr;">
+    <section class="legend">
+      <label>Apps Script URL <input id="apiUrl" placeholder="paste web app url" /></label>
+      <label>Admin Key <input id="adminKey" placeholder="admin key" type="password" /></label>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">
+        <button id="saveBtn" class="primary">Save</button>
+        <button id="loadBtn">Load Picks</button>
+        <button id="lockBtn" class="primary">Lock Board</button>
+        <button id="unlockBtn">Unlock Board</button>
+        <button id="resetBtn" class="danger">Reset Board</button>
+      </div>
+
+      <div class="sub" style="margin-top:8px;">
+        Claimed: <span id="claimedCount">0</span> • Remaining: <span id="remainingCount">100</span> • Paid: <span id="paidCount">0</span>
+      </div>
+
+      <div id="msg" class="msg"></div>
+    </section>
+
+    <section class="legend">
+      <h2>Search by name</h2>
+      <label><input id="search" placeholder="type: mike, julie, etc." /></label>
+      <div id="searchResults" class="claimed"></div>
+    </section>
+
+    <section class="legend">
+      <h2>Manage a Square</h2>
+      <label>Square (1–100) <input id="square" placeholder="25" /></label>
+      <label>Set Paid
+        <select id="paid">
+          <option value="N">No</option>
+          <option value="Y">Yes</option>
+        </select>
+      </label>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="setPaidBtn" class="primary">Update Paid</button>
+        <button id="unclaimBtn" class="danger">Unclaim Square</button>
+      </div>
+      <div id="squareInfo" class="msg"></div>
+    </section>
+  </main>
+
+  <script src="admin.js"></script>
+</body>
+</html>
