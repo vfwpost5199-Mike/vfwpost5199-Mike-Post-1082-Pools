@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Post 1082 Pools</title>
+
+  <style>
+    body { margin:0; font-family:system-ui, Arial, sans-serif; background:#0b0f14; color:#e7edf4; }
+    .wrap { max-width:900px; margin:auto; padding:40px 20px; }
+    h1 { font-size:32px; margin:0 0 6px 0; }
+    .sub { opacity:.75; margin-bottom:18px; }
+
+    .hero { display:block; margin:18px 0 18px 0; text-decoration:none; }
+    .hero img {
+      width:100%; max-width:720px; display:block; margin:auto;
+      border-radius:16px; border:1px solid #1d2633; transition:.2s;
+    }
+    .hero img:hover { transform:scale(1.02); }
+
+    .counter {
+      text-align:center; margin:12px 0 18px 0; padding:18px;
+      border-radius:16px; border:2px solid; transition:.3s;
+    }
+    .counter-big { font-size:26px; font-weight:800; margin-bottom:6px; }
+    .counter-small { font-size:14px; opacity:.85; }
+
+    .green  { background:#0f2b17; border-color:#2ecc71; }
+    .yellow { background:#2b260f; border-color:#f1c40f; }
+    .red    { background:#2b1212; border-color:#e74c3c; }
+    .danger { background:#3a0d0d; border-color:#ff3b3b; animation:pulse 1s infinite alternate; }
+    @keyframes pulse { from { transform:scale(1); } to { transform:scale(1.03); } }
+
+    .activity{
+      margin:0 0 24px 0; padding:16px; background:#0e141c;
+      border:1px solid #1d2633; border-radius:16px;
+    }
+    .activity-title{ font-weight:800; margin-bottom:10px; opacity:.9; }
+    .activity-list{ display:flex; flex-direction:column; gap:8px; font-size:14px; opacity:.9; }
+    .activity-item{
+      display:flex; justify-content:space-between; gap:12px;
+      padding:10px 12px; border:1px solid #1d2633; background:#111925; border-radius:12px;
+    }
+    .activity-left{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .activity-right{ opacity:.75; font-size:12px; white-space:nowrap; }
+    .paidTag{
+      margin-left:8px; font-size:12px; padding:2px 8px; border-radius:999px;
+      border:1px solid #2a3648; opacity:.85;
+    }
+    .paidY{ border-color:#2a6df4; }
+    .paidN{ border-color:#666; }
+
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-top:18px; }
+    .card {
+      background:#0e141c; border:1px solid #1d2633; border-radius:16px; padding:20px;
+      text-decoration:none; color:#e7edf4; transition:.2s;
+    }
+    .card:hover { transform:translateY(-4px); border-color:#2a6df4; }
+    .title { font-size:20px; font-weight:700; margin-bottom:8px; }
+    .desc { opacity:.8; font-size:14px; }
+    .badge { display:inline-block; margin-top:12px; padding:6px 10px; border-radius:10px; background:#2a6df4; font-size:12px; font-weight:600; }
+
+    .footer { margin-top:30px; font-size:12px; opacity:.6; text-align:center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Post 1082 Fundraiser Pools</h1>
+    <div class="sub">Pick your squares • Support the Post • Win big 🇺🇸</div>
+
+    <a href="post1082-march-madness/" class="hero">
+      <img src="images/post1082-march-madness.png" alt="Post 1082 March Madness Squares">
+    </a>
+
+    <div id="counterBox" class="counter green">
+      <div class="counter-big" id="counterBig"><span id="remaining">100</span> of 100 Squares Remaining</div>
+      <div class="counter-small"><span id="claimed">0</span> Claimed</div>
+    </div>
+
+    <div class="activity">
+      <div class="activity-title">🔥 Latest Squares Being Claimed 🔥</div>
+      <div id="activityList" class="activity-list">Loading…</div>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="post1082-march-madness/">
+        <div class="title">🏀 March Madness Squares</div>
+        <div class="desc">100 squares • First come first serve • Paid tracking • Live updates</div>
+        <div class="badge">LIVE</div>
+      </a>
+    </div>
+
+    <div class="footer">American Legion Post 1082 • East Meadow, NY</div>
+  </div>
+
+  <script>
+    // IMPORTANT: paste your Apps Script URL here
+    const API_URL = "PASTE_YOUR_APPS_SCRIPT_URL_HERE";
+
+    function timeAgo(iso){
+      if (!iso) return "";
+      const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+      if (s < 10) return "just now";
+      if (s < 60) return `${s}s ago`;
+      const m = Math.floor(s/60);
+      if (m < 60) return `${m}m ago`;
+      const h = Math.floor(m/60);
+      return `${h}h ago`;
+    }
+
+    // privacy-safe display name: "First L."
+    function displayName(full){
+      if (!full) return "";
+      const parts = full.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0];
+      const first = parts[0];
+      const lastInitial = parts[parts.length - 1][0];
+      return `${first} ${lastInitial}.`;
+    }
+
+    async function loadCounter() {
+      try {
+        const res = await fetch(API_URL + "?action=list&_=" + Date.now());
+        const data = await res.json();
+        if (!data.ok) return;
+
+        const picks = data.picks || {};
+        const claimed = Object.keys(picks).length;
+        const remaining = 100 - claimed;
+
+        document.getElementById("claimed").textContent = claimed;
+        document.getElementById("remaining").textContent = remaining;
+
+        const box = document.getElementById("counterBox");
+        const big = document.getElementById("counterBig");
+
+        box.classList.remove("green","yellow","red","danger");
+
+        if (remaining >= 70) {
+          box.classList.add("green");
+          big.textContent = `${remaining} of 100 Squares Remaining`;
+        } else if (remaining >= 30) {
+          box.classList.add("yellow");
+          big.textContent = `${remaining} of 100 Squares Remaining — Filling Fast`;
+        } else if (remaining >= 10) {
+          box.classList.add("red");
+          big.textContent = `${remaining} Left — Almost Full`;
+        } else if (remaining > 0) {
+          box.classList.add("danger");
+          big.textContent = `🔥 ONLY ${remaining} LEFT 🔥`;
+        } else {
+          box.classList.add("danger");
+          big.textContent = `🏆 SOLD OUT 🏆`;
+        }
+      } catch (e) {}
+    }
+
+    async function loadActivity() {
+      try {
+        const res = await fetch(API_URL + "?action=recent&limit=6&_=" + Date.now());
+        const data = await res.json();
+        if (!data.ok) return;
+
+        const list = document.getElementById("activityList");
+        const items = data.recent || [];
+
+        if (!items.length) {
+          list.innerHTML = `<div style="opacity:.75">No claims yet.</div>`;
+          return;
+        }
+
+        list.innerHTML = items.map(x => {
+          const paidClass = x.paid === "Y" ? "paidY" : "paidN";
+          const paidTxt = x.paid === "Y" ? "PAID" : "UNPAID";
+          return `
+            <div class="activity-item">
+              <div class="activity-left">
+                <strong>#${x.square}</strong> — ${displayName(x.name)}
+                <span class="paidTag ${paidClass}">${paidTxt}</span>
+              </div>
+              <div class="activity-right">${timeAgo(x.ts)}</div>
+            </div>
+          `;
+        }).join("");
+      } catch (e) {}
+    }
+
+    async function refreshAll(){
+      await Promise.all([loadCounter(), loadActivity()]);
+    }
+
+    refreshAll();
+    setInterval(refreshAll, 15000);
+  </script>
+</body>
+</html>
